@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Password Generator</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Generate a Password</h1>
+        <!-- Separate the label from the password content -->
+        <p>Generated Password:</p>
+        <div class="alert alert-secondary" role="alert" id="resultBox" style="display:none; word-wrap: break-word;"></div>
+        <button class="btn btn-success mb-3" id="copyButton" style="display:none;">Copy Password</button>
+        <form id="passwordForm">
+            <div class="form-group">
+                <label for="bytes">Bytes:</label>
+                <input type="number" class="form-control" id="bytes" name="bytes" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#passwordForm').submit(function(event) {
+                event.preventDefault(); // Prevent the form from submitting via the browser
+                var bytes = $('#bytes').val();
+                $.ajax({
+                    url: '/generate-password',
+                    method: 'POST',
+                    data: { bytes: bytes },
+                    success: function(response) {
+                        // Insert only the password into the resultBox
+                        $('#resultBox').show().text(response);
+                        $('#copyButton').show(); // Show the copy button
+                        $('#bytes').val(''); // Clear the input field
+                    }
+                });
+            });
+
+            $('#copyButton').click(function() {
+                var password = $('#resultBox').text();
+                navigator.clipboard.writeText(password).then(function() {
+                    alert('Password copied to clipboard');
+                }, function(err) {
+                    console.error('Could not copy password: ', err);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
